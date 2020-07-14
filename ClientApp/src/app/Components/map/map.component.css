@@ -1,0 +1,9 @@
+@import "https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css";
+@import "https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+
+
+#mapContainer{
+    width: 100%;
+    height: 90vh;
+  }

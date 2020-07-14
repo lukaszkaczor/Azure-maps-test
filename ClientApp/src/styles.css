@@ -1,6 +1,20 @@
-/* You can add global styles to this file, and also import other style files */
+@import "https://atlas.microsoft.com/sdk/javascript/mapcontrol/2/atlas.min.css";
+@import "https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
 
-/* Provide sufficient contrast against white background */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body{
+  width: 100vw;
+  height: 100vh;
+}
+
+
 a {
   color: #0366d6;
 }
