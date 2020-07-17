@@ -49,77 +49,74 @@ export class MapComponent implements OnInit {
   async ngOnInit() {
     this.map = Configuration.Map();
 
-
     this.map.events.add('ready', () => {
-
-
       this._geolocation.GetMyPosition().then((data) => {
         let coordinates: Coordinates = data.coords;
         this.usersPosition = new atlas.data.Position(coordinates.longitude, coordinates.latitude);
         this.map.setCamera(Configuration.Camera(this.usersPosition));
         this.map.setTraffic(Configuration.Traffic(false));
-        this.usersMarker = new atlas.HtmlMarker({
-          position: this.usersPosition,
-          htmlContent: HTMLElements.UserArrow,
 
-        });
-        this.map.markers.add(this.usersMarker);
-        this.htmlUserMarker = document.querySelector('.userArrow');
-        this.htmlUserMarker.style.transform = `rotate(${coordinates.heading}deg)`;
-
-        // this.datasource = new atlas.source.DataSource();
-        // this.map.sources.add(this.datasource);
+        this.datasource = new atlas.source.DataSource(); // <<
+        this.map.sources.add(this.datasource); // <<
         var pipeline = route.MapsURL.newPipeline(new route.SubscriptionKeyCredential(atlas.getSubscriptionKey()));
-
-        //Construct the RouteURL object
         this.routeURL = new route.RouteURL(pipeline);
       }).then(() => {
-        this.tak();
+
+        this.DrawPath();
+
+        // this.datasource = new atlas.source.DataSource();
+        console.log("tak")
+
+        let ds = new atlas.source.DataSource();
+        this.map.sources.add(ds);
+        let te = this.map;
+
+        ds.add(new atlas.data.Feature(new atlas.data.Point(this.usersPosition), {
+          title: 'Pin_',
+        }));
+
+        let sl;
+
+        te.imageSprite.createFromTemplate('myTemplatedIcon', 'triangle-arrow-up', 'teal', '#fff').then(function () {
+
+          //Add a symbol layer that uses the custom created icon.
+          sl = new atlas.layer.SymbolLayer(ds, null, {
+            iconOptions: {
+              image: 'myTemplatedIcon',
+              rotationAlignment: 'map'
+            }
+          })
+          te.layers.add(sl);
+        }).then(() => {
+          console.log(sl)
+
+        });
+
+        // ds.add()
+        // ds.add()
+
+
+        // let symbolLayer = new atlas.layer.SymbolLayer(ds, null, {
+        //   iconOptions: {
+        //     rotationAlignment: 'map',
+        //     pitchAlignment: 'viewport',
+        //     anchor: 'center'
+        //   }
+        // });
+        // this.map.layers.add(symbolLayer);
+
+        // let defaultOptions = symbolLayer.getOptions();
+        // defaultOptions.textOptions.haloColor = '#000000'; //Default is actually rgba(0,0,0,0)
 
       });
     });
   }
-  // ngAfterViewInit(): void {
-  //   console.log("after View init")
-
-  //   // this.usersHeading.
-
-  //   this.map.events.add('ready', () => {
-  //     this.datasource = new atlas.source.DataSource();
-  //     this.map.sources.add(this.datasource);
-  //     // console.log(this.usersPosition)
 
 
-  //     this.map.layers.add(new atlas.layer.LineLayer(this.datasource, null, {
-  //       strokeWidth: 5,
-  //       strokeDashArray: [2, 2],
-  //       lineJoin: 'round',
-  //       lineCap: 'round',
-  //       translateAnchor: 'viewport'
-  //     }), 'labels');
-
-  //     //Create a layer for rendering the GPS points.
-  //     // this.map.layers.add(new atlas.layer.BubbleLayer(this.datasource, null, {
-  //     //   radius: 3,
-  //     //   color: 'red',
-  //     //   strokeWidth: 1,
-  //     //   filter: ['any', ['==', ['geometry-type'], 'Point'], ['==', ['geometry-type'], 'MultiPoint']] //Only render Point or MultiPoints in this layer.
-  //     // }));
-
-  //     this.snapPointsToRoute();
-  //   });
-  // }
-
-  tak() {
-    console.log("after View init")
-
-    // this.usersHeading.
-
+  DrawPath() {
     this.map.events.add('ready', () => {
-      this.datasource = new atlas.source.DataSource();
-      this.map.sources.add(this.datasource);
-      console.log(this.usersPosition)
-
+      // this.datasource = new atlas.source.DataSource();
+      // this.map.sources.add(this.datasource);
 
       this.map.layers.add(new atlas.layer.LineLayer(this.datasource, null, {
         strokeWidth: 5,
@@ -129,13 +126,6 @@ export class MapComponent implements OnInit {
         translateAnchor: 'viewport'
       }), 'labels');
 
-      //Create a layer for rendering the GPS points.
-      // this.map.layers.add(new atlas.layer.BubbleLayer(this.datasource, null, {
-      //   radius: 3,
-      //   color: 'red',
-      //   strokeWidth: 1,
-      //   filter: ['any', ['==', ['geometry-type'], 'Point'], ['==', ['geometry-type'], 'MultiPoint']] //Only render Point or MultiPoints in this layer.
-      // }));
 
       this.snapPointsToRoute();
     });
