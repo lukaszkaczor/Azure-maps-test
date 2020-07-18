@@ -3,7 +3,8 @@ import * as atlas from 'azure-maps-control';
 import * as route from 'azure-maps-rest';
 import { Configuration } from '../../Models/Configuration';
 import { Geolocation } from '../../Models/Geolocation';
-import { HTMLElements } from '../../Models/HTMLElements';
+import { UsersPosition, UsersMarker } from '../../Models/UsersMarker';
+
 
 
 
@@ -44,7 +45,7 @@ export class MapComponent implements OnInit {
     // console.log(result);
   }
 
-
+  def;
 
   async ngOnInit() {
     this.map = Configuration.Map();
@@ -60,12 +61,10 @@ export class MapComponent implements OnInit {
         this.map.sources.add(this.datasource); // <<
         var pipeline = route.MapsURL.newPipeline(new route.SubscriptionKeyCredential(atlas.getSubscriptionKey()));
         this.routeURL = new route.RouteURL(pipeline);
-      }).then(() => {
+      }).then(async () => {
 
         this.DrawPath();
 
-        // this.datasource = new atlas.source.DataSource();
-        console.log("tak")
 
         let ds = new atlas.source.DataSource();
         this.map.sources.add(ds);
@@ -77,46 +76,71 @@ export class MapComponent implements OnInit {
 
         let sl;
 
-        te.imageSprite.createFromTemplate('myTemplatedIcon', 'triangle-arrow-up', 'teal', '#fff').then(function () {
+        // await this.drawUsersMarker(te, ds).then(async (data) => {
+        //   console.log(data);
+        // })
+        let userService = new UsersMarker();
+        let options = await userService.drawUsersMarker(te, ds);
+        console.log(options)
+        userService.setOptions();
+        console.log(userService.getSymbolLayer())
 
-          //Add a symbol layer that uses the custom created icon.
-          sl = new atlas.layer.SymbolLayer(ds, null, {
-            iconOptions: {
-              image: 'myTemplatedIcon',
-              rotationAlignment: 'map'
-            }
-          })
-          te.layers.add(sl);
-        }).then(() => {
-          console.log(sl)
-
-        });
-
-        // ds.add()
-        // ds.add()
-
-
-        // let symbolLayer = new atlas.layer.SymbolLayer(ds, null, {
-        //   iconOptions: {
-        //     rotationAlignment: 'map',
-        //     pitchAlignment: 'viewport',
-        //     anchor: 'center'
-        //   }
-        // });
-        // this.map.layers.add(symbolLayer);
+        // await console.log(this.drawUsersMarker(te, ds));
+        // await console.log(this.drawUsersMarker(te, ds));
 
         // let defaultOptions = symbolLayer.getOptions();
         // defaultOptions.textOptions.haloColor = '#000000'; //Default is actually rgba(0,0,0,0)
-
-      });
+      })
     });
   }
 
 
+  async drawUsersMarker(map, datasource) {
+
+    let symbolLayer: atlas.layer.SymbolLayer;
+    let layerOptions: atlas.SymbolLayerOptions;
+
+    await map.imageSprite.createFromTemplate('myTemplatedIcon', 'triangle-arrow-up', 'teal', '#fff').then(function () {
+      //Add a symbol layer that uses the custom created icon.
+      symbolLayer = new atlas.layer.SymbolLayer(datasource, null, {
+        iconOptions: {
+          image: 'myTemplatedIcon',
+          rotationAlignment: 'map',
+          // pitchAlignment: 'viewport'
+          // rotation: 90
+        }
+      })
+      map.layers.add(symbolLayer);
+      layerOptions = symbolLayer.getOptions();
+      // console.log(e)
+    })
+    return layerOptions;
+  }
+
+  // drawUsersMarker(map, ds) {
+
+  //   let symbolLayer: atlas.layer.SymbolLayer;
+  //   map.imageSprite.createFromTemplate('myTemplatedIcon', 'triangle-arrow-up', 'teal', '#fff').then(function () {
+  //     //Add a symbol layer that uses the custom created icon.
+  //     symbolLayer = new atlas.layer.SymbolLayer(ds, null, {
+  //       iconOptions: {
+  //         image: 'myTemplatedIcon',
+  //         rotationAlignment: 'map',
+  //         // pitchAlignment: 'viewport'
+  //         // rotation: 90
+  //       }
+  //     })
+  //     map.layers.add(symbolLayer);
+
+  //     // return symbolLayer.getOptions();
+  //   }).then(() => {
+
+  //     console.log(symbolLayer)
+  //   })
+  // }
+
   DrawPath() {
     this.map.events.add('ready', () => {
-      // this.datasource = new atlas.source.DataSource();
-      // this.map.sources.add(this.datasource);
 
       this.map.layers.add(new atlas.layer.LineLayer(this.datasource, null, {
         strokeWidth: 5,
@@ -144,11 +168,6 @@ export class MapComponent implements OnInit {
       const data = directions.geojson.getFeatures();
       this.datasource.add(data);
 
-      //Update the map view to center over the route.
-      // this.map.setCamera({
-      //   bounds: data.bbox,
-      //   padding: 30 //Add a padding to account for the pixel size of symbols.
-      // });
     });
   }
 
@@ -170,9 +189,5 @@ export class MapComponent implements OnInit {
     }
   }
 
-  // addLocation() {
-  //   this.path.push([21.950535, 49.647485]);
-  //   this.snapPointsToRoute();
-  // }
 
 }
