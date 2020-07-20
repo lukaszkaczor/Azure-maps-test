@@ -5,7 +5,7 @@ import { PrivateKey } from "../../../../wwwroot/privatekey"
 export class Configuration {
 
     public static _zoom = 15;
-    private static _minZoom = 0;
+    private static _minZoom = 10;
     private static _maxZoom = 23;
     private static _duration = 1000;
     private static _type = 'fly';

@@ -14,6 +14,7 @@ import { AuthorizeGuard } from 'src/api-authorization/authorize.guard';
 import { AuthorizeInterceptor } from 'src/api-authorization/authorize.interceptor';
 import { MapComponent } from './Components/map/map.component';
 import { Geolocation } from './Models/Geolocation';
+import { PathManager } from './Models/PathManager';
 
 @NgModule({
   declarations: [
