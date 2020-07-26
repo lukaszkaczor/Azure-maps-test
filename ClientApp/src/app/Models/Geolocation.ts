@@ -65,6 +65,7 @@ export class Geolocation {
             }
 
             // this.currentPosition.hng = heading + adjustment;
+            this.usersHeading = heading + adjustment;
 
             var phase = this.usersHeading < 0 ? 360 + this.usersHeading : this.usersHeading;
             // var phase = this.currentPosition.hng < 0 ? 360 + this.currentPosition.hng : this.currentPosition.hng;

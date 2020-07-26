@@ -5,17 +5,17 @@ export class UserMarker {
     private _map: atlas.Map;
     private _datasource: atlas.source.DataSource;
     private static symbolLayer: atlas.layer.SymbolLayer;
+    private _userPosition: atlas.data.Position;
 
     constructor(map: atlas.Map, userPosition: atlas.data.Position) {
         this._map = map;
         this._datasource = new atlas.source.DataSource();
         this._map.sources.add(this._datasource);
-        this._datasource.add(new atlas.data.Feature(new atlas.data.Point(userPosition)));
-
-        this.Init();
+        this._userPosition = userPosition;
+        this._datasource.add(new atlas.data.Feature(new atlas.data.Point(this._userPosition)));
     }
 
-    private async Init() {
+    public async Init() {
         await this._map.imageSprite.createFromTemplate('userIcon', 'triangle-arrow-up', '#000', '#fff').then(() => {
             UserMarker.symbolLayer = new atlas.layer.SymbolLayer(this._datasource, null, this.DefaultSymbolLayerOptions());
             this._map.layers.add(UserMarker.symbolLayer)
@@ -36,16 +36,21 @@ export class UserMarker {
         return UserMarker.symbolLayer;
     }
 
-    public SetLayerOptions(options: atlas.SymbolLayerOptions) {
-        UserMarker.symbolLayer.setOptions(options)
+    public async SetLayerOptions(options: atlas.SymbolLayerOptions) {
+        await UserMarker.symbolLayer.setOptions(options)
     }
 
-    async SetOptions() {
-        UserMarker.symbolLayer.setOptions({
-            iconOptions: {
-                rotation: 90
-            }
-        })
+    public SetMarkerPosition(position: atlas.data.Position) {
+        const marker = this._datasource.getShapes()[0];
+        marker.setCoordinates(position);
     }
+
+    // async SetOptions() {
+    //     UserMarker.symbolLayer.setOptions({
+    //         iconOptions: {
+    //             rotation: 90
+    //         }
+    //     })
+    // }
 
 }
